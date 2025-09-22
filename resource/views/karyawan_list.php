@@ -30,9 +30,9 @@ $karyawanList = $controller->getAll();
 <div class="container mx-auto p-6">
   <h1 class="text-2xl font-bold mb-4">Data Karyawan</h1>
 
-  <a href="tambah_karyawan.php" class="mb-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+  <!-- <a href="tambah_karyawan.php" class="mb-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
     <i class="fa fa-plus"></i> Tambah Karyawan
-  </a>
+  </a> -->
 
   <div class="bg-white p-6 rounded shadow overflow-x-auto">
     <h2 class="text-xl font-bold mb-4">Daftar Karyawan</h2>
@@ -49,11 +49,11 @@ $karyawanList = $controller->getAll();
           <th class="border p-2">Tanggal Masuk</th>
           <th class="border p-2">Tanggal Akhir</th>
           <th class="border p-2">Sisa Hari</th>
-          <th class="border p-2">NIK</th>
+          <!-- <th class="border p-2">NIK</th>
           <th class="border p-2">Tempat, Tanggal Lahir</th>
           <th class="border p-2">Email</th>
           <th class="border p-2">No HP</th>
-          <th class="border p-2">Kontak Darurat</th>
+          <th class="border p-2">Kontak Darurat</th> -->
           <th class="border p-2">Aksi</th>
         </tr>
       </thead>
@@ -71,11 +71,11 @@ $karyawanList = $controller->getAll();
               <td class="border p-2"><?= $k['tanggal_awal'] ?></td>
               <td class="border p-2"><?= $k['tanggal_akhir'] ?? '-' ?></td>
               <td class="border p-2"><?= $k['sisa_hari_spk'] ?></td>
-              <td class="border p-2"><?= $k['nik'] ?></td>
+              <!-- <td class="border p-2"><?= $k['nik'] ?></td>
               <td class="border p-2"><?= htmlspecialchars($k['tempat_lahir']) . ', ' . date('d M Y', strtotime($k['tanggal_lahir'])) ?></td>
               <td class="border p-2"><?= $k['email'] ?></td>
               <td class="border p-2"><?= $k['kontak'] ?></td>
-              <td class="border p-2"><?= $k['kontak_darurat'] ?></td>
+              <td class="border p-2"><?= $k['kontak_darurat'] ?></td> -->
               <td class="border p-2 text-center">
                 <a href="edit_karyawan.php?id=<?= $k['id'] ?>" class="text-yellow-600"><i class="fa fa-edit"></i></a>
                 <a href="karyawan_list.php?delete=<?= $k['id'] ?>" onclick="return confirm('Yakin hapus?')" class="text-red-600 ml-2"><i class="fa fa-trash"></i></a>
