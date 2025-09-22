@@ -36,7 +36,7 @@ $username = $_SESSION['username'];
         <i class="fa-solid fa-user-plus mr-2 text-green-600"></i> Tambah Karyawan
       </a>
       <a href="../views/karyawan_list.php" class="block p-2 rounded-lg hover:bg-slate-100">
-        <i class="fa-solid fa-list mr-2 text-blue-600"></i> Data Karyawan
+        <i class="fa-solid fa-list mr-2 text-blue-600"></i> Daftar Karyawan
       </a>
     </div>
 </div>

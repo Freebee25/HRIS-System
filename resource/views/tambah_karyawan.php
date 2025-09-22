@@ -177,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Upload File -->
     <div>
-      <label class="block font-medium mb-1">Upload Dokumen (max 10):</label>
+      <label class="block font-medium mb-1">Upload Dokumen :</label>
       <input type="file" name="files[]" multiple accept=".pdf,.jpg,.png" class="w-full border p-2 rounded">
     </div>
 
