@@ -1,6 +1,6 @@
 <?php 
-include 'db.php';
-include 'karyawanController.php';
+include __DIR__ . "/../../database/db.php";
+include __DIR__ . "/../../controllers/karyawanController.php";
 
 $controller = new KaryawanController($conn);
 
@@ -48,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <option value="freelance" <?= $karyawan['status_pegawai'] == 'freelance' ? 'selected' : '' ?>>Freelance</option>
       </select>
 
-      <input type="date" name="tanggal_awal" value="<?= $karyawan['tanggal_awal'] ?>" class="border p-2 rounded" required>
-      <input type="date" name="tanggal_akhir" value="<?= $karyawan['tanggal_akhir'] ?>" class="border p-2 rounded" required>
+      <input type="date" name="tgl_awal_kontrak" value="<?= $karyawan['tanggal_awal'] ?>" class="border p-2 rounded" required>
+      <input type="date" name="tgl_akhir_kontrak" value="<?= $karyawan['tanggal_akhir'] ?>" class="border p-2 rounded" required>
 
       <select name="status" class="border p-2 rounded" required>
         <option value="active" <?= $karyawan['status'] == 'active' ? 'selected' : '' ?>>Active</option>
