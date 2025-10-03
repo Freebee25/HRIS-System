@@ -20,13 +20,11 @@ class KaryawanController {
 
     // Simpan data karyawan baru
     public function store($data, $files) {
-        // Jika tanggal kosong, set null biar tidak error
         $tglAwal  = !empty($data['tanggal_awal']) ? new DateTime($data['tanggal_awal']) : null;
         $tglAkhir = !empty($data['tanggal_akhir']) ? new DateTime($data['tanggal_akhir']) : null;
         $today    = new DateTime();
         $sisaHari = $tglAkhir ? $today->diff($tglAkhir)->days : null;
 
-        // Insert ke database (sesuai tabel karyawan)
         $sql = "INSERT INTO karyawan 
                 (no_spk, nama, nip, departemen_id, divisi_id, jabatan, status_pegawai, 
                  tanggal_awal, tanggal_akhir, sisa_hari_spk, nik, tempat_lahir, tanggal_lahir, 
@@ -63,63 +61,13 @@ class KaryawanController {
         $karyawanId = $this->conn->lastInsertId();
 
         // Upload file (maks 10)
-        if (!empty($files['files']['name'][0])) {
-            $uploadDir = __DIR__ . "/../uploads/";
-            if (!file_exists($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
-            }
-
-            $fileCount = count($files['files']['name']);
-            $fileCount = min($fileCount, 10); // max 10
-
-            for ($i = 0; $i < $fileCount; $i++) {
-                $fileName = time() . "_" . basename($files['files']['name'][$i]);
-                $targetFile = $uploadDir . $fileName;
-
-                if (move_uploaded_file($files['files']['tmp_name'][$i], $targetFile)) {
-                    $sqlFile = "INSERT INTO karyawan_files (karyawan_id, file_path, uploaded_at) 
-                                VALUES (:karyawan_id, :file_path, NOW())";
-                    $stmtFile = $this->conn->prepare($sqlFile);
-                    $stmtFile->execute([
-                        ':karyawan_id' => $karyawanId,
-                        ':file_path'   => $fileName
-                    ]);
-                }
-            }
-        }
+        $this->uploadFiles($karyawanId, $files);
 
         return true;
     }
 
-    // Hapus karyawan + file
-    public function delete($id) {
-        $stmt = $this->conn->prepare("SELECT file_path FROM karyawan_files WHERE karyawan_id = :id");
-        $stmt->execute([':id' => $id]);
-        $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach ($files as $f) {
-            $filePath = __DIR__ . "/../uploads/" . $f['file_path'];
-            if (file_exists($filePath)) {
-                unlink($filePath);
-            }
-        }
-
-        $this->conn->prepare("DELETE FROM karyawan_files WHERE karyawan_id = :id")->execute([':id' => $id]);
-        $this->conn->prepare("DELETE FROM karyawan WHERE id = :id")->execute([':id' => $id]);
-
-        return true;
-    }
-
-    // Ambil data by ID
-    public function getById($id) {
-        $sql = "SELECT * FROM karyawan WHERE id = :id";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    // Update data karyawan
-    public function update($id, $data) {
+    // Update data karyawan + tambah file baru
+    public function update($id, $data, $files = null) {
         $tglAwal  = !empty($data['tanggal_awal']) ? new DateTime($data['tanggal_awal']) : null;
         $tglAkhir = !empty($data['tanggal_akhir']) ? new DateTime($data['tanggal_akhir']) : null;
         $today    = new DateTime();
@@ -173,6 +121,90 @@ class KaryawanController {
             ':id'              => $id
         ]);
 
+        // Upload file baru kalau ada
+        if ($files) {
+            $this->uploadFiles($id, $files);
+        }
+
+        return true;
+    }
+
+    // Upload file helper
+    private function uploadFiles($karyawanId, $files) {
+        if (!empty($files['files']['name'][0])) {
+            $uploadDir = __DIR__ . "/../uploads/";
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
+            $fileCount = count($files['files']['name']);
+            $fileCount = min($fileCount, 10);
+
+            for ($i = 0; $i < $fileCount; $i++) {
+                $fileName = time() . "_" . basename($files['files']['name'][$i]);
+                $targetFile = $uploadDir . $fileName;
+
+                if (move_uploaded_file($files['files']['tmp_name'][$i], $targetFile)) {
+                    $sqlFile = "INSERT INTO karyawan_files (karyawan_id, file_path, uploaded_at) 
+                                VALUES (:karyawan_id, :file_path, NOW())";
+                    $stmtFile = $this->conn->prepare($sqlFile);
+                    $stmtFile->execute([
+                        ':karyawan_id' => $karyawanId,
+                        ':file_path'   => $fileName
+                    ]);
+                }
+            }
+        }
+    }
+
+    // Hapus karyawan + file
+    public function delete($id) {
+        $stmt = $this->conn->prepare("SELECT file_path FROM karyawan_files WHERE karyawan_id = :id");
+        $stmt->execute([':id' => $id]);
+        $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($files as $f) {
+            $filePath = __DIR__ . "/../uploads/" . $f['file_path'];
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+        }
+
+        $this->conn->prepare("DELETE FROM karyawan_files WHERE karyawan_id = :id")->execute([':id' => $id]);
+        $this->conn->prepare("DELETE FROM karyawan WHERE id = :id")->execute([':id' => $id]);
+
+        return true;
+    }
+
+    // Ambil data by ID
+    public function getById($id) {
+        $sql = "SELECT * FROM karyawan WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Ambil semua file milik karyawan tertentu
+    public function getFilesByKaryawan($id) {
+        $sql = "SELECT * FROM karyawan_files WHERE karyawan_id = :id ORDER BY uploaded_at DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Hapus file tertentu
+    public function deleteFile($fileId) {
+        $stmt = $this->conn->prepare("SELECT file_path FROM karyawan_files WHERE id = :id");
+        $stmt->execute([':id' => $fileId]);
+        $file = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($file) {
+            $filePath = __DIR__ . "/../uploads/" . $file['file_path'];
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            $this->conn->prepare("DELETE FROM karyawan_files WHERE id = :id")->execute([':id' => $fileId]);
+        }
         return true;
     }
 }

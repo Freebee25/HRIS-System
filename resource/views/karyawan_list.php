@@ -49,11 +49,6 @@ $karyawanList = $controller->getAll();
           <th class="border p-2">Tanggal Masuk</th>
           <th class="border p-2">Tanggal Akhir</th>
           <th class="border p-2">Sisa Hari</th>
-          <!-- <th class="border p-2">NIK</th>
-          <th class="border p-2">Tempat, Tanggal Lahir</th>
-          <th class="border p-2">Email</th>
-          <th class="border p-2">No HP</th>
-          <th class="border p-2">Kontak Darurat</th> -->
           <th class="border p-2">Aksi</th>
         </tr>
       </thead>
@@ -63,7 +58,33 @@ $karyawanList = $controller->getAll();
             <tr>
               <td class="border p-2"><?= htmlspecialchars($k['no_spk']) ?></td>
               <td class="border p-2"><?= htmlspecialchars($k['nip']) ?></td>
-              <td class="border p-2"><?= htmlspecialchars($k['nama']) ?></td>
+              <td class="border p-2 relative">
+  <div class="flex items-center space-x-2 relative">
+    <!-- Nama -->
+    <span class="text-blue-600 font-semibold"><?= htmlspecialchars($k['nama']) ?></span>
+
+    <!-- Tombol dropdown -->
+    <button 
+      onclick="toggleDropdown(<?= $k['id'] ?>)" 
+      class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 focus:outline-none"
+    >
+      <i class="fa fa-ellipsis-v"></i>
+    </button>
+
+    <!-- Dropdown -->
+    <div id="dropdown-<?= $k['id'] ?>" 
+         class="hidden absolute right-0 top-full mt-2 w-40 bg-white border rounded shadow-lg z-50">
+      <a href="detail_karyawan.php?id=<?= $k['id'] ?>" class="block px-4 py-2 hover:bg-gray-100">
+        <i class="fa fa-user"></i> Detail
+      </a>
+      <a href="payment_karyawan.php?id=<?= $k['id'] ?>" class="block px-4 py-2 hover:bg-gray-100">
+        <i class="fa fa-money-bill"></i> Payment
+      </a>
+    </div>
+  </div>
+</td>
+
+
               <td class="border p-2"><?= htmlspecialchars($k['nama_departemen'] ?? '-') ?></td>
               <td class="border p-2"><?= htmlspecialchars($k['nama_divisi'] ?? '-') ?></td>
               <td class="border p-2"><?= htmlspecialchars($k['jabatan'] ?? '-') ?></td>
@@ -71,11 +92,6 @@ $karyawanList = $controller->getAll();
               <td class="border p-2"><?= $k['tanggal_awal'] ?></td>
               <td class="border p-2"><?= $k['tanggal_akhir'] ?? '-' ?></td>
               <td class="border p-2"><?= $k['sisa_hari_spk'] ?></td>
-              <!-- <td class="border p-2"><?= $k['nik'] ?></td>
-              <td class="border p-2"><?= htmlspecialchars($k['tempat_lahir']) . ', ' . date('d M Y', strtotime($k['tanggal_lahir'])) ?></td>
-              <td class="border p-2"><?= $k['email'] ?></td>
-              <td class="border p-2"><?= $k['kontak'] ?></td>
-              <td class="border p-2"><?= $k['kontak_darurat'] ?></td> -->
               <td class="border p-2 text-center">
                 <a href="edit_karyawan.php?id=<?= $k['id'] ?>" class="text-yellow-600"><i class="fa fa-edit"></i></a>
                 <a href="karyawan_list.php?delete=<?= $k['id'] ?>" onclick="return confirm('Yakin hapus?')" class="text-red-600 ml-2"><i class="fa fa-trash"></i></a>
@@ -92,6 +108,24 @@ $karyawanList = $controller->getAll();
   </div>
 </div>
 </div>
+ <script>
+function toggleDropdown(id) {
+  // Tutup semua dropdown dulu
+  document.querySelectorAll("[id^='dropdown-']").forEach(el => el.classList.add("hidden"));
+  
+  // Toggle dropdown yang diklik
+  document.getElementById("dropdown-" + id).classList.toggle("hidden");
+}
+
+// Tutup dropdown kalau klik di luar
+window.addEventListener("click", function(e) {
+  document.querySelectorAll("[id^='dropdown-']").forEach(el => {
+    if (!el.previousElementSibling.contains(e.target) && !el.contains(e.target)) {
+      el.classList.add("hidden");
+    }
+  });
+});
+</script>
 
 </body>
 </html>
